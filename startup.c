@@ -32,7 +32,7 @@ void ResetIntHandler()
     // Copy data and fill bss
     extern uint32_t _etext, _data, _edata, _bss, _ebss;
     uint32_t *src = &_etext, *dst = &_data;
-    while(dst < &_edata) *(src++) = *(dst++);
+    while(dst < &_edata) *(dst++) = *(src++);
     for(dst = &_bss; dst < &_ebss; dst++) *dst = 0;
 
     main();

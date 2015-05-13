@@ -20,10 +20,24 @@
 #include "utils/uartstdio.h"
 #include "debug.h"
 
+static uint32_t systick_counter = 0, systick_period;
+void SysTickIntHandler() { systick_counter++; }
+
+void debug_init(uint32_t port, uint32_t baudrate, uint32_t clock)
+{
+    ROM_SysTickPeriodSet(clock);
+    ROM_SysTickEnable();
+    ROM_SysTickIntEnable();
+    systick_period = clock;
+
+    UARTStdioConfig(port, baudrate, clock);
+}
+
 void debug_printf(uint32_t level, const char *file, uint32_t line, const char *msg, ...)
 {
-    uint32_t msec = (systick_counter * ROM_SysTickPeriodGet() + ROM_SysTickValueGet()) * 1000 / ROM_SysCtlClockGet();
-    UARTprintf("%.2u:%.2u:%.2u.%.3u (%s:%u) %s - ", msec / 3600000 % 24, msec / 60000 % 60, msec / 1000 % 60, msec % 1000,
+    uint32_t time_sec = systick_counter;
+    uint32_t time_usec = (systick_period - ROM_SysTickValueGet()) / (systick_period / 1000000);
+    UARTprintf("%02u:%02u:%02u.%06u (%s:%u) %s - ", time_sec / 3600 % 24, time_sec / 60 % 60, time_sec % 60, time_usec % 1000000,
         file, line, level == 1 ? "ERROR" : level == 2 ? "WARN" : level == 3 ? "INFO" : "TRACE");
 
     va_list args;

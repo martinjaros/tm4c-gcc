@@ -43,7 +43,7 @@
 #define TRACE(msg, ...)
 #endif
 
+void debug_init(uint32_t port, uint32_t baudrate, uint32_t clock);
 void debug_printf(uint32_t level, const char *file, uint32_t line, const char *msg, ...);
-extern uint32_t systick_counter;
 
 #endif /* DEBUG_H */

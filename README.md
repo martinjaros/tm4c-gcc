@@ -1,11 +1,15 @@
-TM4C123 GCC project template
-----------------------------
+# TM4C-GCC
 
-Project template for **Tiva C Series** MCU
-<http://www.ti.com/ww/en/launchpad/launchpads-tivac.html>
+Project template for **Tiva** series MCU:  
+<http://www.ti.com/tiva>
 
-Compile with
-<https://launchpad.net/gcc-arm-embedded>
+Toolchains:  
+<https://launchpad.net/gcc-arm-embedded>  
+<http://packages.ubuntu.com/trusty/gcc-arm-none-eabi>
 
-Flash with
+Flash utilities:  
 <https://github.com/utzig/lm4tools/tree/master/lm4flash>
+
+## LICENSE
+Use with ISC license:  
+<http://opensource.org/licenses/ISC>

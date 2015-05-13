@@ -1,32 +1,29 @@
-CFLAGS = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -std=c99 \
-         -ffunction-sections -fdata-sections -Os -Wall -pedantic \
-         -Dgcc -DPART_TM4C123GH6PM -DTARGET_IS_BLIZZARD_RB1
+PART    ?= TM4C123GH6PM
+TARGET  ?= TM4C123_RB1
+CFLAGS  ?= -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -ffunction-sections -fdata-sections -std=c99 -g -Os -Wall -Werror
+LDFLAGS ?= --gc-sections
 
-LIBC := ${shell arm-none-eabi-gcc ${CFLAGS} -print-file-name=libc.a}
-LIBM := ${shell arm-none-eabi-gcc ${CFLAGS} -print-file-name=libm.a}
+LIBGCC  := ${shell arm-none-eabi-gcc ${CFLAGS} -print-libgcc-file-name}
+LIBC    := ${shell arm-none-eabi-gcc ${CFLAGS} -print-file-name=libc.a}
+LIBM    := ${shell arm-none-eabi-gcc ${CFLAGS} -print-file-name=libm.a}
 
-.PHONY: all flash clean
+.PHONY: all clean
 
-all: bin bin/output.bin
-
-flash: all
-	@sudo lm4flash bin/output.bin
+all: output.bin output.lst
 
 clean:
-	@rm -r -f bin
+	rm -f *.d *.o output.*
 
-bin:
-	@mkdir -p bin
+output.axf: $(patsubst %.c, %.o, $(wildcard *.c))
+	arm-none-eabi-ld ${LDFLAGS} -T scatter.ld --entry ResetIntHandler -Map output.map -o $@ $^ ${LIBGCC} ${LIBC} ${LIBM}
 
-bin/output.bin: bin/output.axf
-	@arm-none-eabi-objcopy -O binary $< $@
+-include $(wildcard *.d)
 
-bin/output.axf: $(patsubst src/%.c, bin/%.o, $(wildcard src/*.c))
-	@echo LD $@
-	@arm-none-eabi-ld -T tm4c123.ld --entry ResetISR --gc-sections -o $@ $^ ${LIBM} ${LIBC}
+%.o: %.c
+	arm-none-eabi-gcc ${CFLAGS} -Dgcc -DPART_${PART} -DTARGET_IS_${TARGET} -DUART_BUFFERED -MD -c -o $@ $<
 
-bin/%.o: src/%.c
-	@echo CC $<
-	@arm-none-eabi-gcc ${CFLAGS} -c -MD -o $@ $<
+%.bin: %.axf
+	arm-none-eabi-objcopy -O binary $< $@
 
--include $(wildcard bin/*.d)
+%.lst: %.axf
+	arm-none-eabi-objdump -h -S $< > $@

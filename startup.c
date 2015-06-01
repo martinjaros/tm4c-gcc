@@ -15,8 +15,16 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "inc/hw_types.h"
 #include "inc/hw_nvic.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/gpio.h"
+#include "driverlib/rom.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/pin_map.h"
+#include "utils/uartstdio.h"
+#include "debug.h"
 
 #define STACK_SIZE 256
 
@@ -35,7 +43,19 @@ void ResetIntHandler()
     while(dst < &_edata) *(dst++) = *(src++);
     for(dst = &_bss; dst < &_ebss; dst++) *dst = 0;
 
+    // Setup UART
+    ROM_SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    ROM_GPIOPinConfigure(GPIO_PA0_U0RX | GPIO_PA1_U0TX);
+    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    ROM_IntMasterEnable();
+
+    const uint32_t port = 0, baudrate = 115200;
+    debug_init(port, baudrate, ROM_SysCtlClockGet());
     main();
+
+    while(1);
 }
 
 void DefaultIntHandler()

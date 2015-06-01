@@ -31,6 +31,7 @@ void debug_init(uint32_t port, uint32_t baudrate, uint32_t clock)
     systick_period = clock;
 
     UARTStdioConfig(port, baudrate, clock);
+    UARTwrite("\n", 1);
 }
 
 void debug_printf(uint32_t level, const char *file, uint32_t line, const char *msg, ...)

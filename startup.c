@@ -60,6 +60,10 @@ void ResetIntHandler()
 
 void DefaultIntHandler()
 {
+    // Enable red LED
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
+    ROM_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
     while(1);
 }
 

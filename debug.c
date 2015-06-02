@@ -48,3 +48,15 @@ void debug_printf(uint32_t level, const char *file, uint32_t line, const char *m
     va_end(args);
 }
 
+char* debug_hexify(char *dst, const void *src, size_t n)
+{
+    const uint8_t *u8src = src;
+    const char map[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    size_t i; for(i = 0; i < n; i++)
+    {
+        dst[i * 2] = map[u8src[i] >> 4];
+        dst[i * 2 + 1] = map[u8src[i] & 0xF];
+    }
+    dst[i * 2] = 0;
+    return dst;
+}

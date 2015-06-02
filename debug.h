@@ -17,6 +17,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #if DEBUG_LEVEL > 0
@@ -45,5 +46,6 @@
 
 void debug_init(uint32_t port, uint32_t baudrate, uint32_t clock);
 void debug_printf(uint32_t level, const char *file, uint32_t line, const char *msg, ...);
+char* debug_hexify(char *dst, const void *src, size_t n);
 
 #endif /* DEBUG_H */
